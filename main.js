@@ -5,6 +5,8 @@ let angle;
 let cheeseX = 125;
 let cheeseY = 125;
 
+let DEBUG = true;
+
 function setup() {
   createCanvas(innerWidth, innerHeight);
 
@@ -12,7 +14,9 @@ function setup() {
   y = innerHeight * 0.9;
   angle = random(-PI / 2, -PI);
 
-  // restartOnFocus();
+  if (DEBUG) {
+    restartOnFocus();
+  }
 }
 
 function draw() {
@@ -32,20 +36,17 @@ function draw() {
       );
     }
 
-    // move ant randomly
+    // rotate ant randomly
     angle = angle + random(-PI / 6, PI / 6);
   }
 
   ant(x, y, angle);
 
-  // boundary for mouse interaction with ant
-  // fill(0, 0, 0, 0);
-  // stroke(0, 128, 0, 128);
-  // circle(x, y, 200);
-
+  // move the ant
   x = constrain(x + cos(angle), 15, innerWidth - 15);
   y = constrain(y + sin(angle), 15, innerHeight - 15);
 
+  // mouse cheese piece
   fill(255, 220, 64);
   stroke(230, 190, 0);
   strokeWeight(2);
@@ -58,7 +59,9 @@ function draw() {
     mouseY - 3
   );
 
-  // showMousePosition();
+  if (DEBUG) {
+    showMousePosition();
+  }
 }
 
 function ant(x, y, angle) {
@@ -87,6 +90,13 @@ function ant(x, y, angle) {
   strokeWeight(1);
   line(12, -2, 20, -5);
   line(12, 2, 20, 5);
+
+  // boundary for mouse interaction with ant
+  if (DEBUG) {
+    fill(0, 0, 0, 0);
+    stroke(0, 128, 0, 128);
+    circle(0, 0, 200);
+  }
 
   resetMatrix();
 }
@@ -159,8 +169,9 @@ function instructions() {
 
 function showMousePosition() {
   fill(0);
+  stroke(255);
   strokeWeight(1);
-  text(`(${mouseX}, ${mouseY})`, 10, 24);
+  text(`(${mouseX}, ${mouseY})`, 10, 14);
 }
 
 function restartOnFocus() {
