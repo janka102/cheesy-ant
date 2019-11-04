@@ -31,8 +31,8 @@ function draw() {
 
       // https://en.wikipedia.org/wiki/Mean_of_circular_quantities
       angle = atan2(
-        0.5 * (sin(angle) + sin(angle2)),
-        0.5 * (cos(angle) + cos(angle2))
+        (1 / 3) * (sin(angle) + sin(angle) + sin(angle2)),
+        (1 / 3) * (cos(angle) + cos(angle) + cos(angle2))
       );
     }
 
