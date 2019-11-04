@@ -1,11 +1,20 @@
 let x;
 let y;
 let angle;
+let won;
+let start;
+let end;
 
 let cheeseX = 125;
 let cheeseY = 125;
+let cheeseX1 = cheeseX - 45;
+let cheeseY1 = cheeseY - 35;
+let cheeseX2 = cheeseX + 50;
+let cheeseY2 = cheeseY - 15;
+let cheeseX3 = cheeseX;
+let cheeseY3 = cheeseY + 45;
 
-let DEBUG = true;
+let DEBUG = false;
 
 function setup() {
   createCanvas(innerWidth, innerHeight);
@@ -13,6 +22,8 @@ function setup() {
   x = innerWidth * 0.9;
   y = innerHeight * 0.9;
   angle = random(-PI / 2, -PI);
+  won = false;
+  start = millis();
 
   if (DEBUG) {
     restartOnFocus();
@@ -24,7 +35,7 @@ function draw() {
   instructions();
   picnic();
 
-  if (frameCount % 15 === 0) {
+  if (frameCount % 15 === 0 && !won) {
     // if mouse is close enough, average the angle to mouse with current angle
     if (dist(mouseX, mouseY, x, y) < 200) {
       let angle2 = atan2(mouseY - y, mouseX - x);
@@ -42,9 +53,49 @@ function draw() {
 
   ant(x, y, angle);
 
-  // move the ant
-  x = constrain(x + cos(angle), 15, innerWidth - 15);
-  y = constrain(y + sin(angle), 15, innerHeight - 15);
+  if (!won) {
+    // move the ant
+    x = constrain(x + cos(angle), 15, innerWidth - 15);
+    y = constrain(y + sin(angle), 15, innerHeight - 15);
+  }
+
+  // get slope and y-intercept of the three lines that make the cheese triangle
+  // m = (y2 - y1) / (x2 - x1)
+  // y = m * x + b
+  // b = y - (m * x)
+  let m1 = (cheeseY2 - cheeseY1) / (cheeseX2 - cheeseX1);
+  let b1 = cheeseY1 - m1 * cheeseX1;
+  let m2 = (cheeseY3 - cheeseY2) / (cheeseX3 - cheeseX2);
+  let b2 = cheeseY2 - m2 * cheeseX2;
+  let m3 = (cheeseY1 - cheeseY3) / (cheeseX1 - cheeseX3);
+  let b3 = cheeseY3 - m3 * cheeseX3;
+
+  // detect if the ant is on top of the cheese and display a winning message
+  if (m1 * x + b1 < y - 15) {
+    if (m2 * x + b2 > y + 15) {
+      if (m3 * x + b3 > y + 15) {
+        if (!won) {
+          end = millis();
+          won = true;
+        }
+
+        fill(0);
+        stroke(255);
+        strokeWeight(2);
+        textAlign(CENTER, CENTER);
+        textSize(32);
+        text(
+          "You did it! The ant reached the cheese!\n" +
+            "Now the ant can be happy.\n" +
+            "Your time: " +
+            (end - start) / 1000 +
+            " seconds",
+          innerWidth / 2,
+          innerHeight / 2
+        );
+      }
+    }
+  }
 
   // mouse cheese piece
   fill(255, 220, 64);
@@ -130,18 +181,15 @@ function picnic() {
     }
   }
 
-  // the Cheese
+  // The Cheese
+  cheese();
+}
+
+function cheese() {
   stroke(230, 190, 0);
   strokeWeight(2);
   fill(255, 220, 64);
-  triangle(
-    cheeseX - 45,
-    cheeseY - 35,
-    cheeseX + 50,
-    cheeseY - 15,
-    cheeseX,
-    cheeseY + 45
-  );
+  triangle(cheeseX1, cheeseY1, cheeseX2, cheeseY2, cheeseX3, cheeseY3);
 
   fill(230, 190, 0);
   circle(cheeseX, cheeseY + 22, 10);
@@ -157,6 +205,7 @@ function instructions() {
   strokeWeight(2);
 
   textSize(32);
+  textAlign(LEFT, BOTTOM);
   text(
     "Use your mouse to help guide\nthe ant to the cheese!",
     50,
@@ -171,6 +220,8 @@ function showMousePosition() {
   fill(0);
   stroke(255);
   strokeWeight(1);
+  textSize(14);
+  textAlign(LEFT, BOTTOM);
   text(`(${mouseX}, ${mouseY})`, 10, 14);
 }
 
